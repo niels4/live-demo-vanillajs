@@ -3,7 +3,7 @@ import { cleanupAll } from "../util/cleanupEvents.js"
 
 const PROJECT_NAME = "Vanilla JS"
 const PORT = 38378
-const PAGES_DIRECTORY = "pages"
+const PAGES_DIRECTORY = "live-pages"
 const CSS_FILE = "main.css"
 const HTML_FILE = "main.html"
 const JS_FILE = "main.js"

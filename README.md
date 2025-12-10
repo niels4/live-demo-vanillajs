@@ -34,23 +34,23 @@ npx browser-sync --files "**/*.*" # browser-sync will automatically refresh your
 
 Install the [websocket-text-relay](https://github.com/niels4/websocket-text-relay?tab=readme-ov-file#1-install-the-extension-for-your-text-editor) extension for your text editor of choice.
 
-Now when you edit any file in the `pages` directory, you should see the changes update live in your browser as you type. No saving or refreshing necessary.
+Now when you edit any file in the `live-pages` directory, you should see the changes update live in your browser as you type. No saving or refreshing necessary.
 
 ### Make it your own
 
-Feel free to delete all the existing pages and create your own.
+Feel free to delete all the existing live-pages and create your own.
 
 Create a fresh git repo and push your project to github. If you are just practicing, then keep your repo as private.
 If you wish to publish the repo as a portfolio, make it public and follow the publishing instructions below.
 
 ```bash
 # remove all included examples
-rm -rf pages/*
+rm -rf live-pages/*
 
 # create a simple root page
-echo "<h1>Hello World</h1>" > pages/main.html
-echo "h1 { color: hsl(320 90% 40%); }" > pages/main.css
-echo "console.log('hello world')" > pages/main.js
+echo "<h1>Hello World</h1>" > live-pages/main.html
+echo "h1 { color: hsl(320 90% 40%); }" > live-pages/main.css
+echo "console.log('hello world')" > live-pages/main.js
 
 # create a fresh git repository
 rm -rf .git
