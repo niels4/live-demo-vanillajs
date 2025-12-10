@@ -30,6 +30,23 @@ npx browser-sync --files "**/*.*" # browser-sync will automatically refresh your
 
 ### Live updates
 
-First install the [websocket-text-relay](https://github.com/niels4/websocket-text-relay?tab=readme-ov-file#1-install-the-extension-for-your-text-editor) extension for your text editor of choice.
+Install the [websocket-text-relay](https://github.com/niels4/websocket-text-relay?tab=readme-ov-file#1-install-the-extension-for-your-text-editor) extension for your text editor of choice.
 
-Now when you edit any file in the `pages` directory, you should see the changes update live in your browser.
+Now when you edit any file in the `pages` directory, you should see the changes update live in your browser as you type. No saving or refreshing necessary.
+
+### Publish using github pages
+
+Because this project is just static files, it can be published using github pages.
+
+First create a new github repo and push your project (make sure that index.html is in the root directory of the project).
+
+Next login to the github website and navigate to the settings page of your repository. Click the `Pages` link in the menu
+on the left side of the window.
+
+Under `Build and deployment` make sure `Source` is set to "Deploy from a branch" and `Branch` is set to "main" and "/(root)"
+
+Click save.
+
+Now visit the URL by pressing the `Visit site` button toward the top of the page.
+
+It should be published using the following URL pattern: https://\<github username\>.github.io/\<repository-name\>
