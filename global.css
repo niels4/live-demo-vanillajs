@@ -1,0 +1,29 @@
+html {
+  interpolate-size: allow-keywords;
+  transition-behavior: allow-descrete;
+  overscroll-behavior: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}

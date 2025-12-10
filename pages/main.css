@@ -1,0 +1,28 @@
+body {
+  background-color: hsl(212, 80%, 94%);
+}
+
+.wrapper {
+  font-family: sans-serif;
+}
+
+h1 {
+  color: hsl(320 90% 40%);
+  margin-bottom: 24px;
+}
+
+h2 {
+  margin-bottom: 8px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
