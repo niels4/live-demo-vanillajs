@@ -86,24 +86,28 @@ ws.emitter.on('socket-open', () => {
 })
 ws.emitter.on('message', handleMessage)
 
+// used by setup
 export const subscribeWatchers = () => {
   watchedFiles.forEach((endsWith) => {
     ws.sendMessage({ method: "watch-file", endsWith })
   })
 }
 
+// used by setup
 export const unsubscribeWatchers = () => {
   watchedFiles.forEach((endsWith) => {
     ws.sendMessage({ method: "unwatch-file", endsWith })
   })
 }
 
+// used by setup
 export const initFiles = async () => {
   lastJsText = null
-  const promises = watchedFiles.map(endsWith => fetch(endsWith).then(r => r.text()))
+  const filesToInit = [...watchedFiles]
+  const promises = filesToInit.map(endsWith => fetch(endsWith).then(r => r.text()))
   const files = await Promise.all(promises)
   files.forEach((contents, i) => {
-    const endsWith = watchedFiles[i]
+    const endsWith = filesToInit[i]
     handleWatchFile({ endsWith, contents })
   })
 }
