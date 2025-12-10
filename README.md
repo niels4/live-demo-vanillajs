@@ -15,9 +15,7 @@ will update as you type, no refresh needed.
 
 This project can be served by any plain static http server.
 
-
-Preview the demo using github pages by visitin the url [https://niels4.github.io/live-demo-vanillajs](https://niels4.github.io/live-demo-vanillajs)
-
+Preview the demo using github pages by visiting the url [https://niels4.github.io/live-demo-vanillajs/](https://niels4.github.io/live-demo-vanillajs/)
 
 ## Developer Instructions
 
