@@ -22,6 +22,8 @@ Preview the demo using github pages by visiting the url [https://niels4.github.i
 ### Run project locally
 To run the project locally, clone the directory and serve the root of the directory using any http server
 
+This example uses `browser-sync` (which requires nodejs), however you may use another http server of your choice. EG: `python3 -m http.server`
+
 ```bash
 git clone https://github.com/niels4/live-demo-vanillajs.git
 cd live-demo-vanillajs
@@ -34,11 +36,34 @@ Install the [websocket-text-relay](https://github.com/niels4/websocket-text-rela
 
 Now when you edit any file in the `pages` directory, you should see the changes update live in your browser as you type. No saving or refreshing necessary.
 
+### Make it your own
+
+Feel free to delete all the existing pages and create your own.
+
+Create a fresh git repo and push your project to github. If you are just practicing, then keep your repo as private.
+If you wish to publish the repo as a portfolio, make it public and follow the publishing instructions below.
+
+```bash
+# remove all included examples
+rm -rf pages/*
+
+# create a simple root page
+echo "<h1>Hello World</h1>" > pages/main.html
+echo "h1 { color: hsl(320 90% 40%); }" > pages/main.css
+echo "console.log('hello world')" > pages/main.js
+
+# create a fresh git repository
+rm -rf .git
+git init
+
+# create a new blank repository in github
+# push your repository
+git origin add main git@github.com:\<github username\>/\<repo name\>
+```
+
 ### Publish using github pages
 
 Because this project is just static files, it can be published using github pages.
-
-First create a new github repo and push your project (make sure that index.html is in the root directory of the project).
 
 Next login to the github website and navigate to the settings page of your repository. Click the `Pages` link in the menu
 on the left side of the window.
@@ -49,4 +74,4 @@ Click save.
 
 Now visit the URL by pressing the `Visit site` button toward the top of the page.
 
-It should be published using the following URL pattern: https://\<github username\>.github.io/\<repository-name\>
+It will be published using the following URL pattern: https://\<github username\>.github.io/\<repository-name\>
