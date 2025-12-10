@@ -8,14 +8,19 @@ body {
 
 h1 {
   color: hsl(320 90% 40%);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 h2 {
   margin-bottom: 8px;
 }
 
+p {
+  line-height: 1.5;
+}
+
 section {
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
