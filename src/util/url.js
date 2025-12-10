@@ -6,12 +6,19 @@ let currentSearchString = "";
 let currentSearchParams = new URLSearchParams();
 let currentSearchParamsListener = () => { };
 
+
+// calls the listener with the URLSearchParams when first invoked
+// will call the listener again every time the search param string changes
 window.liveSearchParams = (listener) => {
   // there can only be one global search params listener at a time
   currentSearchParamsListener = listener;
   currentSearchParamsListener(currentSearchParams);
 };
 
+// will update the search param string with the key:value pairs defined by the paramUpdates object (simple js object)
+// it will merge keys with the existing URLSearchParams
+// if you want to delete a key, you must set it to null
+// see live-pages/basics/search-params for examples
 window.setLiveSearchParams = (paramUpdates) => {
   const updatedParams = new URLSearchParams(currentSearchParams)
   for (const [key, value] of Object.entries(paramUpdates)) {
@@ -24,12 +31,14 @@ window.setLiveSearchParams = (paramUpdates) => {
   window.location.hash = createFullHash(currentRoute, updatedParams.toString())
 }
 
+// used by liveState
 export const getCurrentRoute = () => {
   return currentRoute;
 };
 
 const routeListeners = new Set();
 
+// used by setup
 export const addRouteChangeListener = (handler) => {
   handler(currentRoute);
   routeListeners.add(handler);
@@ -44,15 +53,16 @@ const trimSlashRegex = /^([/]*)|[/](?=[/])|([/]*)$/g;
 // remove starting, trailing, and duplicate slashes
 export const trimSlashes = (route) => route.replaceAll(trimSlashRegex, "");
 
+// returns true if the route has changed, false otherwise
 const updateRoute = (route) => {
   const trimmedRoute = trimSlashes(route);
   if (route !== trimmedRoute) {
     window.location.hash = trimmedRoute;
-    return;
+    return false;
   }
 
   if (currentRoute === trimmedRoute) {
-    return;
+    return false;
   }
 
   currentRoute = trimmedRoute;
@@ -60,8 +70,10 @@ const updateRoute = (route) => {
   for (const listener of routeListeners) {
     listener(currentRoute);
   }
+  return true
 };
 
+// returns true if the search string has changed, false otherwise
 const updateSearchParams = (searchString) => {
   if (searchString === currentSearchString) {
     return false;
@@ -69,12 +81,10 @@ const updateSearchParams = (searchString) => {
 
   currentSearchString = searchString;
   currentSearchParams = new URLSearchParams(currentSearchString);
-
-  currentSearchParamsListener(currentSearchParams);
-  return true;
+  return true
 };
 
-export const getRouteAndSearchString = () => {
+const getRouteAndSearchString = () => {
   const fullHash = window.location.hash.substring(1);
   const searchStart = fullHash.indexOf("?");
 
@@ -94,9 +104,9 @@ const createFullHash = (route, searchString) => {
 
 const onHashChange = () => {
   const { route, search } = getRouteAndSearchString();
-  updateRoute(route);
-  if (!updateSearchParams(search)) {
-    // call the search params change handler when the route updates, even if the search string doesn't change
+  const routedUpdated = updateRoute(route);
+  const searchUpdated = updateSearchParams(search)
+  if (routedUpdated || searchUpdated) {
     currentSearchParamsListener(currentSearchParams);
   }
 };
