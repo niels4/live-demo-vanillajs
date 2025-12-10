@@ -3,14 +3,26 @@ import "./cleanupEvents.js";
 
 let currentRoute = "";
 let currentSearchString = "";
-let currentUrlParams = new URLSearchParams();
-let currentSearchParamsListener = () => {};
+let currentSearchParams = new URLSearchParams();
+let currentSearchParamsListener = () => { };
 
 window.liveSearchParams = (listener) => {
   // there can only be one global search params listener at a time
   currentSearchParamsListener = listener;
-  currentSearchParamsListener(currentUrlParams);
+  currentSearchParamsListener(currentSearchParams);
 };
+
+window.setLiveSearchParams = (paramUpdates) => {
+  const updatedParams = new URLSearchParams(currentSearchParams)
+  for (const [key, value] of Object.entries(paramUpdates)) {
+    if (value == null) {
+      updatedParams.delete(key)
+    } else {
+      updatedParams.set(key, value)
+    }
+  }
+  window.location.hash = createFullHash(currentRoute, updatedParams.toString())
+}
 
 export const getCurrentRoute = () => {
   return currentRoute;
@@ -56,9 +68,9 @@ const updateSearchParams = (searchString) => {
   }
 
   currentSearchString = searchString;
-  currentUrlParams = new URLSearchParams(currentSearchString);
+  currentSearchParams = new URLSearchParams(currentSearchString);
 
-  currentSearchParamsListener(currentUrlParams);
+  currentSearchParamsListener(currentSearchParams);
   return true;
 };
 
@@ -76,12 +88,16 @@ export const getRouteAndSearchString = () => {
   }
 };
 
+const createFullHash = (route, searchString) => {
+  return searchString.length === 0 ? route : `${route}?${searchString}`
+}
+
 const onHashChange = () => {
   const { route, search } = getRouteAndSearchString();
   updateRoute(route);
   if (!updateSearchParams(search)) {
     // call the search params change handler when the route updates, even if the search string doesn't change
-    currentSearchParamsListener(currentUrlParams);
+    currentSearchParamsListener(currentSearchParams);
   }
 };
 

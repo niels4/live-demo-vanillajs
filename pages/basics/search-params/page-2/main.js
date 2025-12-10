@@ -6,13 +6,17 @@ const clickCountEle = document.getElementById('click-count')
 
 let clickCount
 
-wtrSearchParams((params) => {
+liveSearchParams((params) => {
   clickCount = Number(params.get('count') ?? 0)
   clickCountEle.innerText = clickCount
 })
 
 const setClickCount = (clickCount) => {
-  console.log("Setting search params will be implemented in the future", clickCount)
+  if (clickCount === 0) {
+    setLiveSearchParams({ count: null })
+    return
+  }
+  setLiveSearchParams({ count: clickCount })
 }
 
 clickMeButton.addEventListener('click', () => {
