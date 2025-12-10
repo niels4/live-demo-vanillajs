@@ -10,7 +10,7 @@ EventTarget.prototype._addEventListener = EventTarget.prototype.addEventListener
 
 // automatically clean up event handlers every time we re-eval a js file
 EventTarget.prototype.addEventListener = function(eventName, handler) {
-  this._addEventListener(eventName, handler)
   const cleanup = () => this.removeEventListener(eventName, handler)
   eventCleanupFuncs.push(cleanup)
+  return this._addEventListener(eventName, handler)
 }
