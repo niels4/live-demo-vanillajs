@@ -1,7 +1,7 @@
 let eventCleanupFuncs = []
 
 export const cleanupAll = () => {
-  eventCleanupFuncs.forEach(f => f())
+  eventCleanupFuncs.forEach((f) => f())
   eventCleanupFuncs = []
 }
 
@@ -9,7 +9,7 @@ export const cleanupAll = () => {
 EventTarget.prototype._addEventListener = EventTarget.prototype.addEventListener
 
 // automatically clean up event handlers every time we re-eval a js file
-EventTarget.prototype.addEventListener = function(eventName, handler) {
+EventTarget.prototype.addEventListener = function (eventName, handler) {
   const cleanup = () => this.removeEventListener(eventName, handler)
   eventCleanupFuncs.push(cleanup)
   return this._addEventListener(eventName, handler)

@@ -20,6 +20,7 @@ Preview the demo using github pages by visiting the url [https://niels4.github.i
 ## Developer Instructions
 
 ### Run project locally
+
 To run the project locally, clone the directory and serve the root of the directory using any http server
 
 This example uses `browser-sync` (which requires nodejs), however you may use another http server of your choice. EG: `python3 -m http.server`

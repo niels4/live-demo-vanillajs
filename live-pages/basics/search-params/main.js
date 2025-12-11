@@ -1,13 +1,13 @@
 console.log("Search Params example page 1...")
 
-const clickMeButton = document.getElementById('click-me-button')
-const resetButton = document.getElementById('reset-button')
-const clickCountEle = document.getElementById('click-count')
+const clickMeButton = document.getElementById("click-me-button")
+const resetButton = document.getElementById("reset-button")
+const clickCountEle = document.getElementById("click-count")
 
 let clickCount
 
 liveSearchParams((params) => {
-  clickCount = Number(params.get('count') ?? 0)
+  clickCount = Number(params.get("count") ?? 0)
   clickCountEle.innerText = clickCount
 })
 
@@ -19,10 +19,10 @@ const setClickCount = (clickCount) => {
   setLiveSearchParams({ count: clickCount })
 }
 
-clickMeButton.addEventListener('click', () => {
+clickMeButton.addEventListener("click", () => {
   setClickCount(clickCount + 1)
 })
 
-resetButton.addEventListener('click', () => {
+resetButton.addEventListener("click", () => {
   setClickCount(0)
 })

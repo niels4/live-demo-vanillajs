@@ -19,7 +19,7 @@ export const setWatchedFiles = (route) => {
   })
 }
 
-const cssElement = document.getElementById('main_style')
+const cssElement = document.getElementById("main_style")
 const htmlElement = document.body
 let lastJsText = null
 
@@ -29,7 +29,9 @@ const handleCss = (contents) => {
 
 const handleHtml = (contents) => {
   htmlElement.innerHTML = contents
-  if (lastJsText) { handleJs(lastJsText) }
+  if (lastJsText) {
+    handleJs(lastJsText)
+  }
 }
 
 const handleJs = (contents) => {
@@ -79,12 +81,12 @@ const handleMessage = (message) => {
 }
 
 const ws = new WebsocketClient({ port: PORT })
-ws.emitter.on('socket-open', () => {
+ws.emitter.on("socket-open", () => {
   ws.sendMessage({ method: "init", name: PROJECT_NAME })
   ws.sendMessage({ method: "watch-log-messages" })
   subscribeWatchers()
 })
-ws.emitter.on('message', handleMessage)
+ws.emitter.on("message", handleMessage)
 
 // used by setup
 export const subscribeWatchers = () => {
@@ -104,11 +106,10 @@ export const unsubscribeWatchers = () => {
 export const initFiles = async () => {
   lastJsText = null
   const filesToInit = [...watchedFiles]
-  const promises = filesToInit.map(endsWith => fetch(endsWith).then(r => r.text()))
+  const promises = filesToInit.map((endsWith) => fetch(endsWith).then((r) => r.text()))
   const files = await Promise.all(promises)
   files.forEach((contents, i) => {
     const endsWith = filesToInit[i]
     handleWatchFile({ endsWith, contents })
   })
 }
-

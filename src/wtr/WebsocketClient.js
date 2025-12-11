@@ -1,6 +1,6 @@
 // import cleanupEvents first so we can be sure we can use _addEventListener when subscribing to websocket events
-import '../util/cleanupEvents.js'
-import { EventEmitter } from '../util/EventEmitter.js'
+import "../util/cleanupEvents.js"
+import { EventEmitter } from "../util/EventEmitter.js"
 
 const RECONNECT_DELAY_SECONDS = 1
 
@@ -27,10 +27,10 @@ export class WebsocketClient {
 
   startClient() {
     this.socket = new WebSocket(this.getUrl())
-    this.socket._addEventListener('open', this._onSocketOpen)
-    this.socket._addEventListener('message', this._onSocketMessage)
-    this.socket._addEventListener('error', this._onSocketError)
-    this.socket._addEventListener('close', this._onSocketClose)
+    this.socket._addEventListener("open", this._onSocketOpen)
+    this.socket._addEventListener("message", this._onSocketMessage)
+    this.socket._addEventListener("error", this._onSocketError)
+    this.socket._addEventListener("close", this._onSocketClose)
   }
 
   onSocketOpen() {
@@ -40,14 +40,18 @@ export class WebsocketClient {
   }
 
   onSocketClose() {
-    console.log(`websocket text relay connection closed. Retrying connection in ${RECONNECT_DELAY_SECONDS} second${RECONNECT_DELAY_SECONDS === 1 ? "" : "s"}...`)
-    if (this.socket == null) { return }
+    console.log(
+      `websocket text relay connection closed. Retrying connection in ${RECONNECT_DELAY_SECONDS} second${RECONNECT_DELAY_SECONDS === 1 ? "" : "s"}...`,
+    )
+    if (this.socket == null) {
+      return
+    }
     this.emitter.emit("socket-close")
     this.socketOpen = false
-    this.socket.removeEventListener('open', this._onSocketOpen)
-    this.socket.removeEventListener('message', this._onSocketMessage)
-    this.socket.removeEventListener('error', this._onSocketError)
-    this.socket.removeEventListener('close', this._onSocketClose)
+    this.socket.removeEventListener("open", this._onSocketOpen)
+    this.socket.removeEventListener("message", this._onSocketMessage)
+    this.socket.removeEventListener("error", this._onSocketError)
+    this.socket.removeEventListener("close", this._onSocketClose)
     this.socket = null
     setTimeout(() => this.startClient(), RECONNECT_DELAY_SECONDS * 1000)
   }
@@ -60,7 +64,7 @@ export class WebsocketClient {
       console.error("Error parsing websocket message JSON", e)
       return
     }
-    this.emitter.emit('message', message)
+    this.emitter.emit("message", message)
   }
 
   onSocketError(error) {
@@ -68,7 +72,9 @@ export class WebsocketClient {
   }
 
   sendMessage(message) {
-    if (!this.socketOpen) { return }
+    if (!this.socketOpen) {
+      return
+    }
     const messageStr = JSON.stringify(message)
     this.socket.send(messageStr)
   }

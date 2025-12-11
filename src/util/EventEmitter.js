@@ -15,7 +15,9 @@ export class EventEmitter {
 
   removeListener(event, listener) {
     const eventSubscribers = this.events.get(event)
-    if (!eventSubscribers) { return }
+    if (!eventSubscribers) {
+      return
+    }
     if (!listener) {
       this.events.delete(event)
       return
@@ -25,7 +27,9 @@ export class EventEmitter {
 
   emit(event, ...args) {
     const eventSubscribers = this.events.get(event)
-    if (!eventSubscribers) { return }
+    if (!eventSubscribers) {
+      return
+    }
     for (const listener of eventSubscribers) {
       listener.apply(this, args)
     }
