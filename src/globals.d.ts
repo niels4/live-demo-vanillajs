@@ -1,18 +1,20 @@
-type LiveSearchListener = (params: object) => void
+export {}
 
-type LiveSearchParams = (listener: LiveSearchListener) => void
+declare global {
+  type LiveSearchListener = (params: object) => void
 
-type SetLiveSearchParams = (paramUpdates: object) => void
+  function liveState(defaultState: object): object
+  function liveSearchParams(listener: LiveSearchListener): void
+  function setLiveSearchParams(paramUpdates: object): void
 
-type LiveState = (defaultState: object) => object
+  interface EventTarget {
+    _addEventListener: typeof EventTarget.prototype.addEventListener
+  }
 
-interface EventTarget {
-  _addEventListener: typeof EventTarget.prototype.addEventListener
-}
-
-interface Window {
-  liveSearchParams: LiveSearchParams
-  liveState: LiveState
-  setLiveSearchParams: SetLiveSearchParams
-  __LIVE_STATES: Map<string, object>
+  interface Window {
+    liveState: typeof liveState
+    liveSearchParams: typeof liveSearchParams
+    setLiveSearchParams: typeof setLiveSearchParams
+    __LIVE_STATES: Map<string, object>
+  }
 }
