@@ -35,7 +35,7 @@ const createLinearScale = (domainMin, domainMax, rangeMin, rangeMax) => {
 
 const getSeriesWindowInfo = (series) => {
   const startTime = series.at(0).time
-  const endTime = series.at(-1).time
+  const endTime = series.at(-2).time
   let maxValue = 0
   series.forEach(({ value }) => {
     if (value > maxValue) {
@@ -89,13 +89,14 @@ const valuePath = drawSvgElement({
 
 const dataWindowSize = 30
 const dataWindowInterval = 1000
+const intervalWidth = width / dataWindowSize - borderWidth * 2
 
 const initDataWindow = () => {
   const now = new Date()
   now.setMilliseconds(0)
-  const startTime = now.valueOf()
+  const endTime = now.valueOf()
   return Array.from({ length: dataWindowSize }, (_, i) => ({
-    time: startTime + i * dataWindowInterval,
+    time: endTime - (dataWindowSize - 1 - i) * dataWindowInterval,
     value: 0,
   }))
 }
@@ -105,6 +106,9 @@ const state = liveState({
   dataWindow: initDataWindow(),
   activityTimeout: null,
 })
+
+const animationKeyFrames = [{ transform: "translateX(0)" }, { transform: `translateX(-${intervalWidth}pt)` }]
+const animationProps = { duration: 1000, easing: "linear", iterations: 1 }
 
 clearTimeout(state.activityTimeout)
 const onTick = () => {
@@ -120,11 +124,14 @@ const onTick = () => {
   let valueScale = createLinearScale(0, maxValue, maxY, minY) // in svg, y increases as it goes down, so we need to flip max and min in the range
   let timeScale = createLinearScale(startTime, endTime, minX, maxX)
 
+  console.log("interval width vs actual:", intervalWidth, timeScale(endTime) - timeScale(endTime - 1000))
+
   const pathCoords = state.dataWindow.map(({ time, value }) => {
     return [timeScale(time), valueScale(value)]
   })
 
   valuePath.setAttribute("d", coordsToPathData(pathCoords))
+  valuePath.animate(animationKeyFrames, animationProps)
 }
 
 const scheduleNextTick = () => {
