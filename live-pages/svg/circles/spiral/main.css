@@ -22,18 +22,6 @@ body {
   display: block;
 }
 
-.gold_ring {
-  stroke: var(--color-golden-sunset);
-}
-
-.wedge_node {
-  fill: var(--color-azure-afternoon);
-}
-
-.w_path {
-  stroke: var(--color-tangerine-sunset);
-}
-
 .test_dot {
   fill: var(--color-tangerine-sunset);
 }

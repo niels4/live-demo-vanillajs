@@ -30,14 +30,6 @@ body {
   fill: var(--color-azure-afternoon);
 }
 
-.w_path {
-  stroke: var(--color-tangerine-sunset);
-}
-
 .test_dot {
   fill: var(--color-tangerine-sunset);
-}
-
-.test_spiral {
-  stroke: var(--color-azure-afternoon);
 }
