@@ -1,5 +1,4 @@
 const TWO_PI = 2 * Math.PI
-const MAX_ANGLE_DELTA = 0.99999
 
 const drawSvgElement = ({ tag, attributes = {}, className = "", parent }) => {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tag)
