@@ -53,20 +53,28 @@ const triggerButton = document.getElementById("trigger_button")
 
 const svgWidth = 1
 const svgHeight = 0.5
+const borderWidth = 0.002
 
-const sidePadding = svgWidth * 0.151
-const vertPadding = svgHeight * 0.254
+const sideMargin = svgWidth * 0.151
+const vertMargin = svgHeight * 0.254
 
-const width = svgWidth - sidePadding * 2
-const height = svgHeight - vertPadding * 2
+const width = svgWidth - sideMargin * 2
+const height = svgHeight - vertMargin * 2
+const vertPadding = 0.006
 
-const minX = sidePadding
-const minY = vertPadding
+const minX = sideMargin
+const minY = vertMargin
+const maxX = minX + width
+const maxY = minY + height
+const clipMinY = minY - borderWidth / 2 - vertPadding
+const clipHeight = height + borderWidth + vertPadding * 2
+const clipMinX = minX - borderWidth / 2
+const clipWidth = width + borderWidth
 
 drawSvgElement({
   tag: "rect",
   className: "outline",
-  attributes: { x: minX, y: minY, height, width },
+  attributes: { x: clipMinX, y: clipMinY, height: clipHeight, width: clipWidth },
   parent: rootNode,
 })
 
@@ -74,6 +82,13 @@ drawSvgElement({
   tag: "circle",
   className: "test_dot",
   attributes: { cx: 0.713, cy: 0.281, r: 0.009 },
+  parent: rootNode,
+})
+
+const valuePath = drawSvgElement({
+  tag: "path",
+  attributes: { d: `M ${minX} ${maxY} L ${maxX} ${maxY}` },
+  className: "time_series_path",
   parent: rootNode,
 })
 
