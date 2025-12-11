@@ -27,10 +27,6 @@ body {
   stroke-width: 0.002;
 }
 
-.test_dot {
-  fill: var(--color-tangerine-sunset);
-}
-
 .time_series_path {
   stroke: var(--color-tangerine-sunset);
   stroke-width: 0.002;

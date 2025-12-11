@@ -46,6 +46,8 @@ const getSeriesWindowInfo = (series) => {
   return { startTime, endTime, maxValue }
 }
 
+const coordsToPathData = (coords) => "M " + coords.map((coord) => coord.join(",")).join(" L ")
+
 const rootNode = document.getElementById("svg_root")
 rootNode.innerHTML = ""
 
@@ -75,13 +77,6 @@ drawSvgElement({
   tag: "rect",
   className: "outline",
   attributes: { x: clipMinX, y: clipMinY, height: clipHeight, width: clipWidth },
-  parent: rootNode,
-})
-
-drawSvgElement({
-  tag: "circle",
-  className: "test_dot",
-  attributes: { cx: 0.713, cy: 0.281, r: 0.009 },
   parent: rootNode,
 })
 
@@ -119,6 +114,17 @@ const onTick = () => {
   state.dataWindow.shift()
   state.dataWindow.push({ time: newTime, value: state.currentActivityCount })
   state.currentActivityCount = 0
+
+  const { startTime, endTime, maxValue } = getSeriesWindowInfo(state.dataWindow)
+
+  let valueScale = createLinearScale(0, maxValue, maxY, minY) // in svg, y increases as it goes down, so we need to flip max and min in the range
+  let timeScale = createLinearScale(startTime, endTime, minX, maxX)
+
+  const pathCoords = state.dataWindow.map(({ time, value }) => {
+    return [timeScale(time), valueScale(value)]
+  })
+
+  valuePath.setAttribute("d", coordsToPathData(pathCoords))
 }
 
 const scheduleNextTick = () => {
