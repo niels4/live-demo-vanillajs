@@ -1,3 +1,7 @@
+body {
+  background-color: hsl(302, 50%, 94%);
+}
+
 .wrapper {
   font-family: sans-serif;
   display: flex;
@@ -7,12 +11,16 @@
 }
 
 h1 {
-  color: hsl(200 50% 60%);
+  color: hsl(200 60% 50%);
 }
 
 button {
   padding: 8px 16px;
   cursor: pointer;
+  background-color: hsl(165, 50%, 80%);
+  border-radius: 8px;
+  border: 1px solid hsl(165, 80%, 20%);
+  color: hsl(165, 80%, 15%);
 }
 
 button:hover {
