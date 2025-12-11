@@ -1,0 +1,32 @@
+:root {
+  --color-navy-nightfall: #0d151b;
+  --color-tangerine-sunset: #fb4b37;
+  --color-golden-sunset: #fbcc3b;
+  --color-amber-dawn: #ffd986;
+  --color-azure-afternoon: #629bc2;
+  --color-ivory-daybreak: #f0ebeb;
+  --color-light-sand-dune: #d6d2c2;
+  --color-evening-shadow: #514a45;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-navy-nightfall);
+}
+
+#svg_root {
+  fill: none;
+  stroke: none;
+  stroke-width: 0.01;
+  height: 100dvh;
+  display: block;
+}
+
+.grid_line {
+  stroke: hsl(0, 0%, 100%);
+  stroke-width: 0.002;
+}
+
+.test_dot {
+  fill: var(--color-tangerine-sunset);
+}
