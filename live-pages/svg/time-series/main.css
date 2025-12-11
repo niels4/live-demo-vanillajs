@@ -30,3 +30,31 @@ body {
 .test_dot {
   fill: var(--color-tangerine-sunset);
 }
+
+#trigger_button {
+  --width: 90px;
+  text-align: center;
+  width: var(--width);
+  position: absolute;
+  left: calc(50% - var(--width) / 2);
+  bottom: 60px;
+}
+
+button {
+  padding: 8px 16px;
+  cursor: pointer;
+  background-color: hsl(165, 50%, 80%);
+  border-radius: 8px;
+  border: 1px solid hsl(165, 80%, 20%);
+  color: hsl(165, 80%, 15%);
+  transition: all 0.2s;
+}
+
+button:hover {
+  filter: brightness(0.94);
+}
+
+button:active {
+  filter: brightness(0.74);
+  transform: translate(0, 1px) scale(0.99);
+}
