@@ -1,0 +1,43 @@
+:root {
+  --color-navy-nightfall: #0d151b;
+  --color-tangerine-sunset: #fb4b37;
+  --color-golden-sunset: #fbcc3b;
+  --color-amber-dawn: #ffd986;
+  --color-azure-afternoon: #629bc2;
+  --color-ivory-daybreak: #f0ebeb;
+  --color-light-sand-dune: #d6d2c2;
+  --color-evening-shadow: #514a45;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-navy-nightfall);
+}
+
+#svg_root {
+  fill: none;
+  stroke: none;
+  stroke-width: 0.01;
+  display: block;
+  height: 100dvh;
+}
+
+.gold_ring {
+  stroke: var(--color-golden-sunset);
+}
+
+.wedge_node {
+  fill: var(--color-azure-afternoon);
+}
+
+.w_path {
+  stroke: var(--color-tangerine-sunset);
+}
+
+.test_dot {
+  fill: var(--color-tangerine-sunset);
+}
+
+.test_spiral {
+  stroke: var(--color-azure-afternoon);
+}
