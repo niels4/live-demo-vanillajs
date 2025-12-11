@@ -76,3 +76,12 @@ Click save.
 Now visit the URL by pressing the `Visit site` button toward the top of the page.
 
 It will be published using the following URL pattern: https://\<github username\>.github.io/\<repository-name\>
+
+## Long term maintenance
+
+This project doesn't use any external dependencies, as long as browsers still exist this code will work forever without any need for updates.
+
+## Live demo with Typescript and React
+
+Check out [live-demo-vite](https://github.com/niels4/live-demo-vite) for an example of a live demo environment
+that uses [vite-plugin-websocket-text-relay](https://github.com/niels4/vite-plugin-websocket-text-relay)
