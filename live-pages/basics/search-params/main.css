@@ -21,8 +21,14 @@ button {
   border-radius: 8px;
   border: 1px solid hsl(165, 80%, 20%);
   color: hsl(165, 80%, 15%);
+  transition: all 0.2s;
 }
 
 button:hover {
   filter: brightness(0.94);
+}
+
+button:active {
+  filter: brightness(0.74);
+  transform: translate(0, 1px) scale(0.99);
 }
