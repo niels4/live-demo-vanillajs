@@ -73,18 +73,46 @@ const clipHeight = height + borderWidth + vertPadding * 2
 const clipMinX = minX - borderWidth / 2
 const clipWidth = width + borderWidth
 
+const clipId = "time-series-clip"
+const defs = drawSvgElement({
+  tag: "defs",
+  parent: rootNode,
+})
+
+const clipPath = drawSvgElement({
+  tag: "clipPath",
+  attributes: { id: clipId },
+  parent: defs,
+})
+
+const clipRectAttributes = { x: clipMinX, y: clipMinY, height: clipHeight, width: clipWidth }
+
+drawSvgElement({
+  tag: "rect",
+  attributes: clipRectAttributes,
+  parent: clipPath,
+})
+
 drawSvgElement({
   tag: "rect",
   className: "outline",
-  attributes: { x: clipMinX, y: clipMinY, height: clipHeight, width: clipWidth },
+  attributes: clipRectAttributes,
+  parent: rootNode,
+})
+
+const clippedGroup = drawSvgElement({
+  tag: "g",
+  attributes: { "clip-path": `url(#${clipId})` },
   parent: rootNode,
 })
 
 const valuePath = drawSvgElement({
   tag: "path",
-  attributes: { d: `M ${minX} ${maxY} L ${maxX} ${maxY}` },
+  attributes: {
+    d: `M ${minX} ${maxY} L ${maxX} ${maxY}`,
+  },
   className: "time_series_path",
-  parent: rootNode,
+  parent: clippedGroup,
 })
 
 const dataWindowSize = 30
@@ -101,6 +129,19 @@ const initDataWindow = () => {
   }))
 }
 
+const pathFromDataWindow = (dataWindow) => {
+  const { startTime, endTime, maxValue } = getSeriesWindowInfo(dataWindow)
+
+  let valueScale = createLinearScale(0, maxValue, maxY, minY) // in svg, y increases as it goes down, so we need to flip max and min in the range
+  let timeScale = createLinearScale(startTime, endTime, minX, maxX)
+
+  const pathCoords = dataWindow.map(({ time, value }) => {
+    return [timeScale(time), valueScale(value)]
+  })
+
+  return coordsToPathData(pathCoords)
+}
+
 const state = liveState({
   currentActivityCount: 0,
   dataWindow: initDataWindow(),
@@ -108,8 +149,7 @@ const state = liveState({
 })
 
 const animationKeyFrames = [{ transform: "translateX(0)" }, { transform: `translateX(-${intervalWidth}pt)` }]
-const animationProps = { duration: 1000, easing: "linear", iterations: 1 }
-
+const animationProps = { duration: 1000, easing: "linear", iterations: 1, fill: "forwards" }
 clearTimeout(state.activityTimeout)
 const onTick = () => {
   scheduleNextTick()
@@ -119,18 +159,7 @@ const onTick = () => {
   state.dataWindow.push({ time: newTime, value: state.currentActivityCount })
   state.currentActivityCount = 0
 
-  const { startTime, endTime, maxValue } = getSeriesWindowInfo(state.dataWindow)
-
-  let valueScale = createLinearScale(0, maxValue, maxY, minY) // in svg, y increases as it goes down, so we need to flip max and min in the range
-  let timeScale = createLinearScale(startTime, endTime, minX, maxX)
-
-  console.log("interval width vs actual:", intervalWidth, timeScale(endTime) - timeScale(endTime - 1000))
-
-  const pathCoords = state.dataWindow.map(({ time, value }) => {
-    return [timeScale(time), valueScale(value)]
-  })
-
-  valuePath.setAttribute("d", coordsToPathData(pathCoords))
+  valuePath.setAttribute("d", pathFromDataWindow(state.dataWindow))
   valuePath.animate(animationKeyFrames, animationProps)
 }
 

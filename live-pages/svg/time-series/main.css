@@ -22,6 +22,10 @@ body {
   display: block;
 }
 
+.test_dot {
+  fill: var(--color-tangerine-sunset);
+}
+
 .outline {
   stroke: hsl(0, 0%, 100%);
   stroke-width: 0.002;
