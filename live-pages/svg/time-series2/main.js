@@ -22,32 +22,6 @@ const drawSvgElement = ({ tag, attributes = {}, className = "", parent }) => {
   return element
 }
 
-const createLinearScale = (domainMin, domainMax, rangeMin, rangeMax) => {
-  const domainSize = domainMax - domainMin
-  if (domainSize === 0) {
-    return () => rangeMin
-  }
-  const rangeSize = rangeMax - rangeMin
-  const ratio = rangeSize / domainSize
-
-  return (domainValue) => (domainValue - domainMin) * ratio + rangeMin
-}
-
-const getSeriesWindowInfo = (series) => {
-  const startTime = series.at(0).time
-  const endTime = series.at(-2).time
-  let maxValue = 0
-  series.forEach(({ value }) => {
-    if (value > maxValue) {
-      maxValue = value
-    }
-  })
-
-  return { startTime, endTime, maxValue }
-}
-
-const coordsToPathData = (coords) => "M " + coords.map((coord) => coord.join(",")).join(" L ")
-
 const rootNode = document.getElementById("svg_root")
 rootNode.innerHTML = ""
 
@@ -62,16 +36,16 @@ const vertMargin = svgHeight * 0.254
 
 const width = svgWidth - sideMargin * 2
 const height = svgHeight - vertMargin * 2
-const vertPadding = 0.006
+// const vertPadding = 0.006
 
 const minX = sideMargin
 const minY = vertMargin
-const maxX = minX + width
 const maxY = minY + height
-const clipMinY = minY - borderWidth / 2 - vertPadding
-const clipHeight = height + borderWidth + vertPadding * 2
-const clipMinX = minX - borderWidth / 2
-const clipWidth = width + borderWidth
+// const maxX = minX + width
+const clipMinY = minY
+const clipHeight = height
+const clipMinX = minX
+const clipWidth = width
 
 const clipId = "time-series-clip"
 const defs = drawSvgElement({
@@ -108,7 +82,7 @@ const clippedGroup = drawSvgElement({
 
 const dataWindowSize = 30
 const dataWindowInterval = 1000
-const intervalWidth = width / dataWindowSize - borderWidth * 2
+const intervalWidth = width / (dataWindowSize - 1)
 
 const initDataWindow = () => {
   const now = new Date()
@@ -120,34 +94,17 @@ const initDataWindow = () => {
   }))
 }
 
-const pathFromDataWindow = (dataWindow) => {
-  const { startTime, endTime, maxValue } = getSeriesWindowInfo(dataWindow)
-
-  let valueScale = createLinearScale(0, maxValue, maxY, minY) // in svg, y increases as it goes down, so we need to flip max and min in the range
-  let timeScale = createLinearScale(startTime, endTime, minX, maxX)
-
-  const pathCoords = dataWindow.map(({ time, value }) => {
-    return [timeScale(time), valueScale(value)]
+const processDataWindow = (dataWindow) => {
+  let maxValue = 0
+  const coords = dataWindow.map(({ value }, i) => {
+    if (value > maxValue) {
+      maxValue = value
+    }
+    return `${i},${value}`
   })
-
-  return coordsToPathData(pathCoords)
+  const path = "M " + coords.join(" L ")
+  return { path, maxValue }
 }
-
-const pathFromDataWindow3 = (dataWindow) => {
-  const { startTime, endTime, maxValue } = getSeriesWindowInfo(dataWindow)
-
-  let valueScale = (x) => x
-  let timeScale = (x) => x - startTime
-
-  const pathCoords = dataWindow.map(({ time, value }) => {
-    return [timeScale(time), valueScale(value)]
-  })
-
-  return coordsToPathData(pathCoords)
-}
-
-const pathFromDataWindow2 = (dataWindow) =>
-  "M " + dataWindow.map((point) => `${point.time},${point.value}`).join(" L ")
 
 const intialDataWindow = initDataWindow()
 intialDataWindow[0].value = 0.05
@@ -163,42 +120,17 @@ const state = liveState({
 })
 clearTimeout(state.activityTimeout)
 
+const intialPathInfo = processDataWindow(state.dataWindow)
+const valueScale = height / intialPathInfo.maxValue
 const valuePath = drawSvgElement({
   tag: "path",
   attributes: {
-    d: pathFromDataWindow(state.dataWindow),
-    transform: `translate(${-0.1}, 0)`,
+    d: intialPathInfo.path,
+    transform: `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`,
   },
   className: "time_series_path",
   parent: rootNode,
 })
-
-const { startTime, endTime, maxValue } = getSeriesWindowInfo(intialDataWindow)
-const pathData = pathFromDataWindow3(intialDataWindow)
-
-const scaledGroup = drawSvgElement({
-  tag: "g",
-  attributes: { transform: `translate(0.05, 0) scale(${1 / (1000 * intialDataWindow.length)}, 1)` },
-  parent: rootNode,
-})
-
-const valuePath2 = drawSvgElement({
-  tag: "path",
-  attributes: {
-    d: pathData,
-  },
-  className: "time_series_path2",
-  parent: scaledGroup,
-})
-
-// const valuePath3 = drawSvgElement({
-//   tag: "path",
-//   attributes: {
-//     d: pathData,
-//   },
-//   className: "time_series_path3",
-//   parent: rootNode,
-// })
 
 const animationKeyFrames = [{ transform: "translateX(0)" }, { transform: `translateX(-${intervalWidth}pt)` }]
 const animationProps = { duration: 1000, easing: "linear", iterations: 1, fill: "forwards" }
@@ -211,7 +143,6 @@ const onTick = () => {
   state.dataWindow.push({ time: newTime, value: state.currentActivityCount })
   state.currentActivityCount = 0
 
-  valuePath.setAttribute("d", pathFromDataWindow(state.dataWindow))
   valuePath.animate(animationKeyFrames, animationProps)
 }
 

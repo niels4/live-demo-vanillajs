@@ -37,19 +37,6 @@ body {
   vector-effect: non-scaling-stroke;
 }
 
-.time_series_path2 {
-  stroke: orange;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-  /* transform: translate(-58851666.36666667, 0); */
-}
-
-.time_series_path3 {
-  stroke: green;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
 #trigger_button {
   --width: 90px;
   text-align: center;
