@@ -108,31 +108,36 @@ const processDataWindow = (dataWindow) => {
 }
 
 const intialDataWindow = initDataWindow()
-intialDataWindow[0].value = 0.05
-intialDataWindow[1].value = 0.5
-intialDataWindow[8].value = 0.37
-intialDataWindow[11].value = 0.37
-intialDataWindow[21].value = 2
+// intialDataWindow[0].value = 1
+// intialDataWindow[8].value = 1
+// intialDataWindow[21].value = 2
 
 const state = liveState({
   currentActivityCount: 0,
   dataWindow: intialDataWindow,
+  prevValueScale: 1,
   activityTimeout: null,
 })
 clearTimeout(state.activityTimeout)
 
 const initialPathInfo = processDataWindow(state.dataWindow)
+state.prevValueScale = initialPathInfo.valueScale
+const scaledGroup = drawSvgElement({
+  tag: "g",
+  attributes: {
+    transform: `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-initialPathInfo.valueScale})`,
+  },
+  parent: clippedGroup,
+})
+
 const valuePath = drawSvgElement({
   tag: "path",
   attributes: {
     d: initialPathInfo.path,
-    transform: `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-initialPathInfo.valueScale})`,
   },
   className: "time_series_path",
-  parent: clippedGroup,
+  parent: scaledGroup,
 })
-
-const animationProps = { duration: 1000, easing: "linear", iterations: 1 }
 
 const onTick = () => {
   scheduleNextTick()
@@ -143,7 +148,20 @@ const onTick = () => {
   state.currentActivityCount = 0
   const { path, valueScale } = processDataWindow(state.dataWindow)
   valuePath.setAttribute("d", path)
-  valuePath.setAttribute("transform", `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`)
+  scaledGroup.style.transition = ""
+  scaledGroup.setAttribute(
+    "transform",
+    `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-state.prevValueScale})`,
+  )
+  state.prevValueScale = valueScale
+
+  requestAnimationFrame(() => {
+    scaledGroup.style.transition = "all 1s linear"
+    scaledGroup.setAttribute(
+      "transform",
+      `translate(${minX - intervalWidth}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`,
+    )
+  })
 }
 
 const scheduleNextTick = () => {
