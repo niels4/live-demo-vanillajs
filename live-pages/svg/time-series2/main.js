@@ -36,14 +36,14 @@ const vertMargin = svgHeight * 0.254
 
 const width = svgWidth - sideMargin * 2
 const height = svgHeight - vertMargin * 2
-// const vertPadding = 0.006
+const vertPadding = 0.006
 
 const minX = sideMargin
 const minY = vertMargin
 const maxY = minY + height
 // const maxX = minX + width
-const clipMinY = minY
-const clipHeight = height
+const clipMinY = minY - vertPadding
+const clipHeight = height + vertPadding * 2
 const clipMinX = minX
 const clipWidth = width
 
@@ -67,16 +67,16 @@ drawSvgElement({
   parent: clipPath,
 })
 
+const clippedGroup = drawSvgElement({
+  tag: "g",
+  attributes: { "clip-path": `url(#${clipId})` },
+  parent: rootNode,
+})
+
 drawSvgElement({
   tag: "rect",
   className: "outline",
   attributes: clipRectAttributes,
-  parent: rootNode,
-})
-
-const clippedGroup = drawSvgElement({
-  tag: "g",
-  attributes: { "clip-path": `url(#${clipId})` },
   parent: rootNode,
 })
 
@@ -121,7 +121,7 @@ const state = liveState({
 clearTimeout(state.activityTimeout)
 
 const intialPathInfo = processDataWindow(state.dataWindow)
-const valueScale = height / intialPathInfo.maxValue
+const valueScale = intialPathInfo.maxValue === 0 ? 1 : height / intialPathInfo.maxValue
 const valuePath = drawSvgElement({
   tag: "path",
   attributes: {
@@ -129,7 +129,7 @@ const valuePath = drawSvgElement({
     transform: `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`,
   },
   className: "time_series_path",
-  parent: rootNode,
+  parent: clippedGroup,
 })
 
 const animationKeyFrames = [{ transform: "translateX(0)" }, { transform: `translateX(-${intervalWidth}pt)` }]
