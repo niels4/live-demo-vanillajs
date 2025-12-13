@@ -29,7 +29,6 @@ const triggerButton = document.getElementById("trigger_button")
 
 const svgWidth = 1
 const svgHeight = 0.5
-const borderWidth = 0.002
 
 const sideMargin = svgWidth * 0.151
 const vertMargin = svgHeight * 0.254
@@ -41,7 +40,6 @@ const vertPadding = 0.006
 const minX = sideMargin
 const minY = vertMargin
 const maxY = minY + height
-// const maxX = minX + width
 const clipMinY = minY - vertPadding
 const clipHeight = height + vertPadding * 2
 const clipMinX = minX
@@ -146,14 +144,18 @@ const onTick = () => {
   state.dataWindow.shift()
   state.dataWindow.push({ time: newTime, value: state.currentActivityCount })
   state.currentActivityCount = 0
-  const { path, valueScale } = processDataWindow(state.dataWindow)
-  valuePath.setAttribute("d", path)
+  const { path, valueScale, maxValue } = processDataWindow(state.dataWindow)
   scaledGroup.style.transition = ""
+  valuePath.setAttribute("d", path)
   scaledGroup.setAttribute(
     "transform",
     `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-state.prevValueScale})`,
   )
   state.prevValueScale = valueScale
+
+  if (maxValue === 0) {
+    return
+  }
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {

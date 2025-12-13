@@ -33,8 +33,9 @@ body {
 
 .time_series_path {
   stroke: var(--color-tangerine-sunset);
-  stroke-width: 2;
+  stroke-width: 3;
   vector-effect: non-scaling-stroke;
+  shape-rendering: crispEdges;
 }
 
 #trigger_button {
