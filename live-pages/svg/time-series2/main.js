@@ -82,7 +82,7 @@ drawSvgElement({
 
 const dataWindowSize = 30
 const dataWindowInterval = 1000
-const intervalWidth = width / (dataWindowSize - 1)
+const intervalWidth = width / (dataWindowSize - 2)
 
 const initDataWindow = () => {
   const now = new Date()
@@ -103,7 +103,8 @@ const processDataWindow = (dataWindow) => {
     return `${i},${value}`
   })
   const path = "M " + coords.join(" L ")
-  return { path, maxValue }
+  const valueScale = maxValue === 0 ? 1 : height / maxValue
+  return { path, valueScale, maxValue }
 }
 
 const intialDataWindow = initDataWindow()
@@ -120,20 +121,18 @@ const state = liveState({
 })
 clearTimeout(state.activityTimeout)
 
-const intialPathInfo = processDataWindow(state.dataWindow)
-const valueScale = intialPathInfo.maxValue === 0 ? 1 : height / intialPathInfo.maxValue
+const initialPathInfo = processDataWindow(state.dataWindow)
 const valuePath = drawSvgElement({
   tag: "path",
   attributes: {
-    d: intialPathInfo.path,
-    transform: `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`,
+    d: initialPathInfo.path,
+    transform: `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-initialPathInfo.valueScale})`,
   },
   className: "time_series_path",
   parent: clippedGroup,
 })
 
-const animationKeyFrames = [{ transform: "translateX(0)" }, { transform: `translateX(-${intervalWidth}pt)` }]
-const animationProps = { duration: 1000, easing: "linear", iterations: 1, fill: "forwards" }
+const animationProps = { duration: 1000, easing: "linear", iterations: 1 }
 
 const onTick = () => {
   scheduleNextTick()
@@ -142,8 +141,9 @@ const onTick = () => {
   state.dataWindow.shift()
   state.dataWindow.push({ time: newTime, value: state.currentActivityCount })
   state.currentActivityCount = 0
-
-  valuePath.animate(animationKeyFrames, animationProps)
+  const { path, valueScale } = processDataWindow(state.dataWindow)
+  valuePath.setAttribute("d", path)
+  valuePath.setAttribute("transform", `translate(${minX}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`)
 }
 
 const scheduleNextTick = () => {
@@ -152,7 +152,7 @@ const scheduleNextTick = () => {
   state.activityTimeout = setTimeout(onTick, millisUntilNextSecond)
 }
 
-// scheduleNextTick()
+scheduleNextTick()
 
 triggerButton.addEventListener("click", () => {
   state.currentActivityCount++
