@@ -156,11 +156,13 @@ const onTick = () => {
   state.prevValueScale = valueScale
 
   requestAnimationFrame(() => {
-    scaledGroup.style.transition = "all 1s linear"
-    scaledGroup.setAttribute(
-      "transform",
-      `translate(${minX - intervalWidth}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`,
-    )
+    requestAnimationFrame(() => {
+      scaledGroup.style.transition = "all 1s linear"
+      scaledGroup.setAttribute(
+        "transform",
+        `translate(${minX - intervalWidth}, ${maxY}) scale(${intervalWidth}, ${-valueScale})`,
+      )
+    })
   })
 }
 
