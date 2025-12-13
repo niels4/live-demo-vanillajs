@@ -28,6 +28,7 @@ const svgRoot = document.getElementById("svg_root")
 const scaledWidth = 0.8
 const scaledHeight = scaledWidth / 2
 const vertPadding = 12
+const clipId = "time-series-clip"
 
 let svgHeight, svgWidth
 
@@ -50,7 +51,6 @@ const drawGraph = () => {
   maxY = minY + height
 
   const clipRectAttributes = { x: minX, width, y: minY - vertPadding, height: height + vertPadding * 2 }
-  console.log("drawing rect")
   drawSvgElement({
     tag: "rect",
     className: "outline",
@@ -58,11 +58,29 @@ const drawGraph = () => {
     parent: svgRoot,
   })
 
+  const clipPath = drawSvgElement({
+    tag: "clipPath",
+    attributes: { id: clipId },
+    parent: svgRoot,
+  })
+
+  drawSvgElement({
+    tag: "rect",
+    attributes: clipRectAttributes,
+    parent: clipPath,
+  })
+
+  const clippedGroup = drawSvgElement({
+    tag: "g",
+    attributes: { "clip-path": `url(#${clipId})` },
+    parent: svgRoot,
+  })
+
   valuePath = drawSvgElement({
     tag: "path",
     attributes: { d: "" },
     className: "time_series_path",
-    parent: svgRoot,
+    parent: clippedGroup,
   })
 }
 
@@ -111,7 +129,6 @@ const animationProps = { duration: 1000, easing: "linear", iterations: 1, fill: 
 
 const onTick = async () => {
   scheduleNextTick()
-  console.log("ticking")
   const prevEndTime = state.dataWindow.at(-1).time
   const newTime = prevEndTime + dataWindowInterval
   state.dataWindow.shift()
@@ -132,7 +149,6 @@ const onTick = async () => {
   ]
 
   state.prevValueScale = valueScale
-  console.log("starting animation")
   valuePath.animate(animationKeyFrames, animationProps)
 }
 
