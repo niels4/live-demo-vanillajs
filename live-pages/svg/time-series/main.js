@@ -1,3 +1,4 @@
+/** @returns {SVGElement} */
 const drawSvgElement = ({ tag, attributes = {}, className = "", parent }) => {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tag)
 
@@ -10,9 +11,7 @@ const drawSvgElement = ({ tag, attributes = {}, className = "", parent }) => {
   }
 
   Object.entries(attributes).forEach(([name, val]) => {
-    if (val != null) {
-      element.setAttribute(name, val)
-    }
+    element.setAttribute(name, val)
   })
 
   if (parent) {
@@ -22,102 +21,72 @@ const drawSvgElement = ({ tag, attributes = {}, className = "", parent }) => {
   return element
 }
 
-const createLinearScale = (domainMin, domainMax, rangeMin, rangeMax) => {
-  const domainSize = domainMax - domainMin
-  if (domainSize === 0) {
-    return () => rangeMin
-  }
-  const rangeSize = rangeMax - rangeMin
-  const ratio = rangeSize / domainSize
+const svgRoot = document.getElementById("svg_root")
 
-  return (domainValue) => (domainValue - domainMin) * ratio + rangeMin
-}
+const scaledWidth = 0.8
+const scaledHeight = 0.5
+const vertPadding = 12
+const clipId = "time-series-clip"
 
-const getSeriesWindowInfo = (series) => {
-  const startTime = series.at(0).time
-  const endTime = series.at(-2).time
-  let maxValue = 0
-  series.forEach(({ value }) => {
-    if (value > maxValue) {
-      maxValue = value
-    }
+let svgHeight, svgWidth
+
+let minX, minY, maxY, height, width
+
+let valuePath
+
+const drawGraph = () => {
+  svgHeight = window.innerHeight
+  svgWidth = window.innerWidth
+  svgRoot.innerHTML = ""
+  svgRoot.setAttribute("height", svgHeight)
+  svgRoot.setAttribute("width", svgWidth)
+  svgRoot.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`)
+
+  width = Math.round(svgWidth * scaledWidth)
+  minX = Math.round((svgWidth - width) / 2)
+  height = Math.round(svgHeight * scaledHeight)
+  minY = Math.round((svgHeight - height) / 2)
+  maxY = minY + height
+
+  const clipRectAttributes = { x: minX, width, y: minY - vertPadding, height: height + vertPadding * 2 }
+
+  const clipPath = drawSvgElement({
+    tag: "clipPath",
+    attributes: { id: clipId },
+    parent: svgRoot,
   })
 
-  return { startTime, endTime, maxValue }
+  drawSvgElement({
+    tag: "rect",
+    attributes: clipRectAttributes,
+    parent: clipPath,
+  })
+
+  const clippedGroup = drawSvgElement({
+    tag: "g",
+    attributes: { "clip-path": `url(#${clipId})` },
+    parent: svgRoot,
+  })
+
+  valuePath = drawSvgElement({
+    tag: "path",
+    attributes: { d: "" },
+    className: "time_series_path",
+    parent: clippedGroup,
+  })
+
+  drawSvgElement({
+    tag: "rect",
+    className: "outline",
+    attributes: clipRectAttributes,
+    parent: svgRoot,
+  })
 }
-
-const coordsToPathData = (coords) => "M " + coords.map((coord) => coord.join(",")).join(" L ")
-
-const rootNode = document.getElementById("svg_root")
-rootNode.innerHTML = ""
 
 const triggerButton = document.getElementById("trigger_button")
 
-const svgWidth = 1
-const svgHeight = 0.5
-const borderWidth = 0.002
-
-const sideMargin = svgWidth * 0.151
-const vertMargin = svgHeight * 0.254
-
-const width = svgWidth - sideMargin * 2
-const height = svgHeight - vertMargin * 2
-const vertPadding = 0.006
-
-const minX = sideMargin
-const minY = vertMargin
-const maxX = minX + width
-const maxY = minY + height
-const clipMinY = minY - borderWidth / 2 - vertPadding
-const clipHeight = height + borderWidth + vertPadding * 2
-const clipMinX = minX - borderWidth / 2
-const clipWidth = width + borderWidth
-
-const clipId = "time-series-clip"
-const defs = drawSvgElement({
-  tag: "defs",
-  parent: rootNode,
-})
-
-const clipPath = drawSvgElement({
-  tag: "clipPath",
-  attributes: { id: clipId },
-  parent: defs,
-})
-
-const clipRectAttributes = { x: clipMinX, y: clipMinY, height: clipHeight, width: clipWidth }
-
-drawSvgElement({
-  tag: "rect",
-  attributes: clipRectAttributes,
-  parent: clipPath,
-})
-
-drawSvgElement({
-  tag: "rect",
-  className: "outline",
-  attributes: clipRectAttributes,
-  parent: rootNode,
-})
-
-const clippedGroup = drawSvgElement({
-  tag: "g",
-  attributes: { "clip-path": `url(#${clipId})` },
-  parent: rootNode,
-})
-
-const valuePath = drawSvgElement({
-  tag: "path",
-  attributes: {
-    d: `M ${minX} ${maxY} L ${maxX} ${maxY}`,
-  },
-  className: "time_series_path",
-  parent: clippedGroup,
-})
-
 const dataWindowSize = 30
 const dataWindowInterval = 1000
-const intervalWidth = width / dataWindowSize - borderWidth * 2
 
 const initDataWindow = () => {
   const now = new Date()
@@ -129,29 +98,35 @@ const initDataWindow = () => {
   }))
 }
 
-const pathFromDataWindow = (dataWindow) => {
-  const { startTime, endTime, maxValue } = getSeriesWindowInfo(dataWindow)
-
-  let valueScale = createLinearScale(0, maxValue, maxY, minY) // in svg, y increases as it goes down, so we need to flip max and min in the range
-  let timeScale = createLinearScale(startTime, endTime, minX, maxX)
-
-  const pathCoords = dataWindow.map(({ time, value }) => {
-    return [timeScale(time), valueScale(value)]
+const processDataWindow = (dataWindow) => {
+  let maxValue = 0
+  const coords = dataWindow.map(({ value }, i) => {
+    if (value > maxValue) {
+      maxValue = value
+    }
+    return `${i},${value}`
   })
-
-  return coordsToPathData(pathCoords)
+  const path = "M " + coords.join(" L ")
+  const valueScale = maxValue === 0 ? 1 : height / maxValue
+  return { path, valueScale, maxValue }
 }
+
+const intialDataWindow = initDataWindow()
+// intialDataWindow[0].value = 1
+// intialDataWindow[8].value = 1
+// intialDataWindow[21].value = 2
 
 const state = liveState({
   currentActivityCount: 0,
-  dataWindow: initDataWindow(),
+  dataWindow: intialDataWindow,
+  prevValueScale: 1,
   activityTimeout: null,
 })
-
-const animationKeyFrames = [{ transform: "translateX(0)" }, { transform: `translateX(-${intervalWidth}pt)` }]
-const animationProps = { duration: 1000, easing: "linear", iterations: 1, fill: "forwards" }
 clearTimeout(state.activityTimeout)
-const onTick = () => {
+
+const animationProps = { duration: 1000, easing: "linear", iterations: 1, fill: "forwards" }
+
+const onTick = async () => {
   scheduleNextTick()
   const prevEndTime = state.dataWindow.at(-1).time
   const newTime = prevEndTime + dataWindowInterval
@@ -159,7 +134,20 @@ const onTick = () => {
   state.dataWindow.push({ time: newTime, value: state.currentActivityCount })
   state.currentActivityCount = 0
 
-  valuePath.setAttribute("d", pathFromDataWindow(state.dataWindow))
+  const { path, valueScale } = processDataWindow(state.dataWindow)
+  valuePath.setAttribute("d", path)
+
+  const intervalWidth = width / (dataWindowSize - 2)
+  const animationKeyFrames = [
+    {
+      transform: `translateX(${minX}px) translateY(${maxY}px) scaleX(${intervalWidth}) scaleY(${-state.prevValueScale})`,
+    },
+    {
+      transform: `translateX(${minX - intervalWidth}px) translateY(${maxY}px) scaleX(${intervalWidth}) scaleY(${-valueScale})`,
+    },
+  ]
+
+  state.prevValueScale = valueScale
   valuePath.animate(animationKeyFrames, animationProps)
 }
 
@@ -174,5 +162,8 @@ scheduleNextTick()
 triggerButton.addEventListener("click", () => {
   state.currentActivityCount++
 })
+
+drawGraph()
+window.addEventListener("resize", drawGraph)
 
 console.log("time series")
