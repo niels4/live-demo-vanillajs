@@ -21,15 +21,17 @@ Preview the demo using github pages by visiting the url [https://niels4.github.i
 
 ### Run project locally
 
-To run the project locally, clone the directory and serve the root of the directory using any http server
+To run the project locally, clone the directory and serve the root of the directory using any http server.
 
-This example uses `browser-sync` (which requires nodejs), however you may use another http server of your choice. EG: `python3 -m http.server`
+This example uses `serve` (which requires nodejs), however you may use another http server of your choice. EG: `python3 -m http.server`
 
 ```bash
 git clone https://github.com/niels4/live-demo-vanillajs.git
 cd live-demo-vanillajs
-npx browser-sync --files "**/*.*" # browser-sync will automatically refresh your browser when you save a file
+npx serve
 ```
+
+If you use `npx serve`, the url:port will be copied to your clipboard. Just open a browser and paste the location.
 
 ### Live updates
 
